@@ -12,7 +12,7 @@ struct GameView: View {
     @StateObject var viewModel: GameViewModel = GameViewModel()
     var body: some View {
         VStack {
-            Text("Welcome to 1024 by YourName!").font(.title2)
+            Text("Welcome to 1024 by Connor!").font(.title2)
             NumberGrid(viewModel: viewModel)
                 .gesture(DragGesture().onEnded {
                     swipeDirection = determineSwipeDirection($0)
@@ -39,7 +39,7 @@ struct NumberGrid: View {
                 HStack (spacing:4) {
                     ForEach(0..<size, id: \.self) { column in
                         let cellValue = viewModel.grid[row][column]
-                        Text("\(cellValue)")
+                        Text(cellValue == 0 ? "" : "\(cellValue)")
                             .font(.system(size:26))
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .aspectRatio(CGSize(width: 1, height: 1), contentMode: .fit)
