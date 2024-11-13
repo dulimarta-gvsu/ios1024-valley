@@ -22,10 +22,17 @@ struct GameView: View {
                 .frame(
                     maxWidth: .infinity
                 )
-            if let swipeDirection {
-                Text("You swiped \(swipeDirection)")
+            if viewModel.win {
+                Text("You Win!")
+            } else if viewModel.lose {
+                Text("You Lose")
+            }
+            Text("Swipes: \(viewModel.steps)")
+            Button("Reset") {
+                viewModel.resetGame()
             }
         }.frame(maxHeight: .infinity, alignment: .top)
+        
     }
 }
 

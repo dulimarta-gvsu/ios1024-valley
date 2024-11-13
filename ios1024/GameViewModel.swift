@@ -8,8 +8,8 @@ import SwiftUI
 class GameViewModel: ObservableObject {
     @Published var grid: Array<Array<Int>>
     @Published var steps: Int = 0
-    
-    
+    @Published var win: Bool = false
+    @Published var lose: Bool = false
     
     init () {
         grid = Array(repeating: Array(repeating: 0, count: 4), count: 4)
@@ -37,16 +37,38 @@ class GameViewModel: ObservableObject {
         grid[randx][randy] = 1
     }
     
+    func resetGame() {
+        grid = Array(repeating: Array(repeating: 0, count: 4), count: 4)
+        let randx = Int.random(in: 0..<4)
+        let randy = Int.random(in: 0..<4)
+        grid[randx][randy] = 1
+        steps = 0
+        win = false
+        lose = false
+    }
+    
     func checkGameOver() {
-        
+        win = checkWin()
+        lose = checkLose()
     }
     
-    func checkWin() {
-        
+    func checkWin() -> Bool {
+        for r in 0..<4 {
+            for c in 0..<4 {
+                if grid[r][c] == 1024 {
+                    return true
+                }
+            }
+        }
+        return false
     }
     
-    func checkLose() {
-        
+    func checkLose() -> Bool {
+        if !isValidMove(dir: 0) && !isValidMove(dir: 1) && !isValidMove(dir: 2) && !isValidMove(dir: 3) {
+            return true
+        } else {
+            return false
+        }
     }
     
     func isValidMove(dir: Int) -> Bool {
@@ -103,7 +125,7 @@ class GameViewModel: ObservableObject {
     }
     
     func swipeLeft() {
-        if isValidMove(dir: 0) {
+        if isValidMove(dir: 0) && !win && !lose {
             steps += 1
             for r in 0..<4 {
                 var lastMergeCol = -1
@@ -127,11 +149,12 @@ class GameViewModel: ObservableObject {
                 }
             }
             placeOne()
+            checkGameOver()
         }
     }
     
     func swipeUp() {
-        if isValidMove(dir: 1) {
+        if isValidMove(dir: 1) && !win && !lose {
             steps += 1
             for c in 0..<4 {
                 var lastMergeRow = -1
@@ -155,11 +178,12 @@ class GameViewModel: ObservableObject {
                 }
             }
             placeOne()
+            checkGameOver()
         }
     }
     
     func swipeRight() {
-        if isValidMove(dir: 2) {
+        if isValidMove(dir: 2) && !win && !lose {
             steps += 1
             for r in 0..<4 {
                 var lastMergeCol = 4
@@ -183,11 +207,12 @@ class GameViewModel: ObservableObject {
                 }
             }
             placeOne()
+            checkGameOver()
         }
     }
     
     func swipeDown() {
-        if isValidMove(dir: 3) {
+        if isValidMove(dir: 3) && !win && !lose {
             steps += 1
             for c in 0..<4 {
                 var lastMergeRow = 4
@@ -211,6 +236,7 @@ class GameViewModel: ObservableObject {
                 }
             }
             placeOne()
+            checkGameOver()
         }
     }
 }
