@@ -9,10 +9,18 @@ import SwiftUI
 
 struct GameView: View {
     @State var swipeDirection: SwipeDirection? = .none
-    @StateObject var viewModel: GameViewModel = GameViewModel()
+    @EnvironmentObject var viewModel: GameViewModel
+    @EnvironmentObject var nav: MyNavigator
+    
     var body: some View {
         VStack {
-            Text("Welcome to 1024 by YourName!").font(.title2)
+            Text("Welcome to 1024 by Connor!").font(.title2)
+            HStack {
+                Text("Swipes: \(viewModel.steps)")
+                Button("Reset") {
+                    viewModel.resetGame()
+                }
+            }
             NumberGrid(viewModel: viewModel)
                 .gesture(DragGesture().onEnded {
                     swipeDirection = determineSwipeDirection($0)
@@ -22,24 +30,48 @@ struct GameView: View {
                 .frame(
                     maxWidth: .infinity
                 )
-            if let swipeDirection {
-                Text("You swiped \(swipeDirection)")
+            if viewModel.win {
+                Text("You Win!")
+            } else if viewModel.lose {
+                Text("You Lose")
             }
-        }.frame(maxHeight: .infinity, alignment: .top)
+            HStack {
+                Button("Config") {
+                    nav.navigate(to: .SettingsScreen)
+                }.padding()
+                Button("Stats") {
+                    nav.navigate(to: .StatsScreen)
+                }.padding()
+            }
+        }
+        .frame(maxHeight: .infinity, alignment: .top)
+        .buttonStyle(.borderedProminent)
+        
+        VStack {
+            Button("Logout") {
+                Task {
+                    await viewModel.signOut()
+                    nav.navigateToRoot()
+                }
+            }
+        }
+        .frame(alignment: .bottom)
+        .buttonStyle(.borderedProminent)
+
     }
 }
 
 struct NumberGrid: View {
     @ObservedObject var viewModel: GameViewModel
-    let size: Int = 4
+    //let size: Int = 4
 
     var body: some View {
         VStack(spacing:4) {
-            ForEach(0..<size, id: \.self) { row in
+            ForEach(0..<viewModel.size, id: \.self) { row in
                 HStack (spacing:4) {
-                    ForEach(0..<size, id: \.self) { column in
+                    ForEach(0..<viewModel.size, id: \.self) { column in
                         let cellValue = viewModel.grid[row][column]
-                        Text("\(cellValue)")
+                        Text(cellValue == 0 ? "" : "\(cellValue)")
                             .font(.system(size:26))
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .aspectRatio(CGSize(width: 1, height: 1), contentMode: .fit)
